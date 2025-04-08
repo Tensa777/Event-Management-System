@@ -161,10 +161,14 @@ def main():
 
     elif choice == "Event Info":
         st.subheader("Event Information")
-        events = runQuery("SELECT *,(SELECT COUNT(*) FROM participants AS P WHERE P.event_id = E.event_id) AS count FROM events AS E LEFT JOIN event_type USING(type_id) LEFT JOIN location USING(location_id)")
+        # Updated query with explicit columns
+        events = runQuery("SELECT e.event_id, e.event_title, e.event_price, e.participants, e.date, et.type_name, l.location_name, (SELECT COUNT(*) FROM participants AS P WHERE P.event_id = e.event_id) AS count FROM events AS e LEFT JOIN event_type AS et USING(type_id) LEFT JOIN location AS l USING(location_id)")
         if events:
             for event in events:
-                st.write(f"Title: {event[1]}, Price: {event[2]}, Max Participants: {event[3]}, Type: {event[7]}, Location: {event[9]}, Date: {event[5]}, Current Participants: {event[10]}")
+                # Adjusted indices based on the new query
+                st.write(f"Title: {event[1]}, Price: {event[2]}, Max Participants: {event[3]}, Type: {event[5] or 'N/A'}, Location: {event[6] or 'N/A'}, Date: {event[4]}, Current Participants: {event[7]}")
+        else:
+            st.write("No events available.")
 
     elif choice == "Participants":
         st.subheader("Participants")
